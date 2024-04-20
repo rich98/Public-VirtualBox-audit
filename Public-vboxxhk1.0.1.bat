@@ -146,7 +146,7 @@ echo Set Data classification Valid entries:CUI, OUO, AC, U, CI, CO, C, S, TS
 set /p govclass="Please set the classification of Data? "
 echo ******************************************************************************************************
 
-set scriptver=Publicvboxchk1.0.0
+set scriptver=Publicvboxchk1.0.1
 if /i "%govclass%"=="CU1" (
     set clss="Controlled Unclassified Information "
 ) else if /i "%govclass%"=="OUO" (
