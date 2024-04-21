@@ -1,4 +1,19 @@
 @echo off
+
+rem Check if /debug switch is used
+if "%1" == "/legacy" (
+    goto legacy
+)
+
+rem Check if /debug switch is used
+if "%1" == "/debug" (
+    goto debugging
+)
+
+rem Check if /debug switch is used
+if "%1" == "/noadmin" (
+    goto noadminset
+)
 REM -------------------------------------------------------------------
 REM This batch file is free software; you can redistribute it and/or modify
 REM it under the terms of the GNU General Public License as published by
@@ -16,20 +31,7 @@ REM Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, U
 REM 
 REM Copyright (C) [2024] [Richard Wadsworth]
 REM -------------------------------------------------------------------
-rem Check if /debug switch is used
-if "%1" == "/legacy" (
-    goto legacy
-)
 
-rem Check if /debug switch is used
-if "%1" == "/debug" (
-    goto debug
-)
-
-rem Check if /debug switch is used
-if "%1" == "/noadmin" (
-    goto noadminset
-)
 
 :tempfolder
 if not exist "c:\temp" (
@@ -197,6 +199,8 @@ echo ***** Data classification set to %clss% ***** >> %results_file%
 
 :tail
 rem tail entries for ref.
+echo User has classified the data as: %clss% 
+echo User has classified the data as: %clss% >> %results_file%
 (
 echo ******************************************************************************************************
 echo BMN Number: BMN%BMN%
@@ -258,8 +262,10 @@ if /i "%rerun%"=="yes" (
 )
 
 
-:debug
+:debugging
 
+:setlocl
+setlocal enabledelayedexpansion
 :admincheck
 REM Check if the user is running as admin (administrator)
 >nul 2>&1 net session
@@ -281,7 +287,7 @@ setlocal enabledelayedexpansion
 
 :: Set file paths and timestamps
 set "datestamp=%date:~-4%%date:~-7,2%%date:~-10,2%-%time:~0,2%%time:~3,2%"
-set "Dresults_file=c:\temp\\Desktop\VirtualBox_chk_Debug-%computername%-%datestamp%.txt"
+set "Dresults_file=c:\temp\VirtualBox_chk_Debug-%computername%-%datestamp%.txt"
 set Dscriptver=vboxchk1.0.0-debug-mode
 
 :: Export registry keys to variables
@@ -325,6 +331,7 @@ echo VitualBox Installation Directory: %Dvboxinstall%
 echo VitualBox Guest adds "(if installed)": %Dguestadd%
 echo VitualBox SDK "if installed)":  %DvboxSDK%
 echo Script version: %Dscriptver%
+wmic cpu get deviceid, name, SocketDesignation, NumberOfCores, NumberOfLogicalProcessors
 echo ******************************************************************************************************
 echo Detailed VirtualBox Extension Pack Check
 "%Dvboxinstall%vboxmanage.exe" list extpacks
@@ -369,7 +376,7 @@ echo VirtualBox Guest adds "(if installed)": %Dguestadd%
 echo VirtualBox SDK "(if installed)":  %DvboxSDK%
 echo Script version: %Dscriptver%
 ) > "%Dresults_file%"
-
+wmic cpu get deviceid, name, SocketDesignation, NumberOfCores, NumberOfLogicalProcessors  | more  >> %Dresults_file%
 :: Output to screen
 type "%Dresults_file%"
 
@@ -385,7 +392,7 @@ if "%rerun%"=="" (
 
 REM Check if input is "yes" or "no"
 if /i "%rerun%"=="yes" (
-    goto debug
+    goto debugging
 ) else if /i "%rerun%"=="no" (
     goto :end
 ) else (
